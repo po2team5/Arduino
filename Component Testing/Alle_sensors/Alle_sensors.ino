@@ -1,18 +1,20 @@
 // Line sensor pins
-int lineEmitter = 2;
-int lineOne = 4;
-int lineTwo = 7;
-int lineThree = 8;
-int lineFour = 11;
-int lineFive = 12;
-int lineSix = 13;
+#define LINE_EMITTER  2
+#define LINE_ONE      4
+#define LINE_TWO      7
+#define LINE_THREE    8
+#define LINE_FOUR     11
+#define LINE_FIVE     12
+#define LINE_SIX      13
+#define LINE_NUM      6
+#define LINE_TIMEOUT  2500
 //Motor pins
-int motorA1 = 5;
-int motorA2 = 6;
-int motorB1 = 9;
-int motorB2 = 10;
+#define MOTOR_A1      5
+#define MOTOR_A2      6
+#define MOTOR_B1      9
+#define MOTOR_B2      10
 //Distance sensor pins
-int distancePin = A0;
+#define DISTANCE_PIN  A0
 
 void setup() {
   // put your setup code here, to run once:
