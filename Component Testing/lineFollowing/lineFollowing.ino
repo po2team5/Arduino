@@ -1,6 +1,6 @@
 #include <QTRSensors.h>
 #include <Motor.h>
-
+//Line sensor pins
 #define LINE_EMITTER  2
 #define LINE_ONE      4
 #define LINE_TWO      7
@@ -10,6 +10,12 @@
 #define LINE_SIX      13
 #define LINE_NUM      6
 #define LINE_TIMEOUT  2500
+//Motor pins
+#define MOTOR_L1      5
+#define MOTOR_L2      6
+#define MOTOR_R1      9
+#define MOTOR_R2      10
+
 
 QTRSensorsRC lineSensor((unsigned char[])
 {LINE_ONE,
@@ -27,8 +33,8 @@ int links;
 int rechts;
 int midden;
 
-Motor motorLinks = Motor(5,6);
-Motor motorRechts = Motor(9,10);
+Motor motorLinks = Motor(MOTOR_L1,MOTOR_L2);
+Motor motorRechts = Motor(MOTOR_R1,MOTOR_R2);
 
 void setup() {
   delay(500);
