@@ -1,13 +1,13 @@
 #include <Motor.h>
 
-Motor motorA = Motor(3,5);
-Motor motorB = Motor(6,9);
+Motor motorA = Motor(5,6);
+Motor motorB = Motor(9,10);
 
 
 
 void setup() {
-  motorA.setMotorSpeed(-1);
-  motorB.setMotorSpeed(1);
+  motorA.setMotorSpeed(20);
+  motorB.setMotorSpeed(20);
   motorA.startMotor();
   motorB.startMotor();
 
