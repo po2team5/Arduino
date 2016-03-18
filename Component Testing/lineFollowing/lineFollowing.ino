@@ -15,7 +15,7 @@
 #define MOTOR_L2      6
 #define MOTOR_R1      9
 #define MOTOR_R2      10
-
+#define BASIS_SNELHEID  10
 
 QTRSensorsRC lineSensor((unsigned char[])
 {LINE_ONE,
@@ -36,13 +36,19 @@ int midden;
 Motor motorLinks = Motor(MOTOR_L1,MOTOR_L2);
 Motor motorRechts = Motor(MOTOR_R1,MOTOR_R2);
 
+int linksCorrectie = 0;
+int rechtsCorrectie = 0;
+
 void setup() {
   delay(500);
   for (int i = 0; i < 100; i++){
     lineSensor.calibrate();
   }
   Serial.begin(9600);
-  motorLinks
+  motorLinks.setMotorSpeed(BASIS_SNELHEID);
+  motorRechts.setMotorSpeed(-BASIS_SNELHEID);
+  motorLinks.startMotor();
+  motorRechts.startMotor();
 }
 
 void loop() {
@@ -54,7 +60,8 @@ void loop() {
   Serial.print("\t");
   Serial.print(rechts);
   Serial.println();
-  delay(250);
+  checkDirection();
+  updateMotorSpeed();
 }
 
 void parseLine(unsigned int values[]){
@@ -65,5 +72,24 @@ void parseLine(unsigned int values[]){
   links = (links1*2 + links2)/3;
   midden = 1000 - (values[2]+values[3])/2;
   rechts = (rechts1+rechts2*2)/3;
+}
+
+void checkDirection(){
+  if(links>midden){
+    linksCorrectie++;
+  }else{
+    linksCorrectie=0;
+  }
+  if(rechts>midden){
+    rechtsCorrectie++;
+  }else{
+    rechtsCorrectie=0;
+  }
+  
+}
+
+void updateMotorSpeed(){
+  motorLinks.setMotorSpeed(BASIS_SNELHEID + linksCorrectie);
+  motorRechts.setMotorSpeed(BASIS_SNELHEID + rechtsCorrectie);
 }
 
