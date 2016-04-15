@@ -15,7 +15,7 @@
 #define MOTOR_L2      6
 #define MOTOR_R1      9
 #define MOTOR_R2      10
-#define BASIS_SNELHEID  10
+#define BASIS_SNELHEID  15
 
 QTRSensorsRC lineSensor((unsigned char[])
 {LINE_ONE,
@@ -62,6 +62,7 @@ void loop() {
   Serial.println();
   checkDirection();
   updateMotorSpeed();
+  delay(1);
 }
 
 void parseLine(unsigned int values[]){
