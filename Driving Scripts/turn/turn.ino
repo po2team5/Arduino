@@ -4,24 +4,28 @@
 #define MOTOR_L2      6
 #define MOTOR_R1      9
 #define MOTOR_R2      10
-#define BASIS_SNELHEID  10
+#define BASIS_SNELHEID  30
 
-#define turn_time 200
+#define TURN_TIME 500
 
 Motor motorLinks = Motor(MOTOR_L1,MOTOR_L2);
 Motor motorRechts = Motor(MOTOR_R1,MOTOR_R2);
 
 void setup() {
-  // put your setup code here, to run once:
-
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-
+  motorLinks.setMotorSpeed(BASIS_SNELHEID);
+  motorRechts.setMotorSpeed(BASIS_SNELHEID);
+  motorLinks.startMotor();
+  motorRechts.startMotor();
+  delay(2000);
+  motorLinks.stopMotor();
+  motorRechts.stopMotor();
+  turn(true);
 }
 
-void turn(boolean direction) {
+int turn(boolean direction){
   if(direction){
     motorLinks.setMotorSpeed(-BASIS_SNELHEID);
     motorRechts.setMotorSpeed(BASIS_SNELHEID);
@@ -29,5 +33,22 @@ void turn(boolean direction) {
     motorLinks.setMotorSpeed(BASIS_SNELHEID);
     motorRechts.setMotorSpeed(-BASIS_SNELHEID);
   }
+  motorLinks.startMotor();
+  motorRechts.startMotor();
+  for(int i = 0; i<TURN_TIME; i++){
+    if(labviewCheck()){
+      delay(1);
+    }
+    else{
+      return 0;
+    }
+  }
+  motorLinks.stopMotor();
+  motorRechts.stopMotor();
+  return 1;
 }
 
+//voorlopige functie in afwachting van stop knop van labview
+boolean labviewCheck(){
+  return true;
+}
