@@ -43,7 +43,7 @@ LINE_TIMEOUT,
 LINE_EMITTER);
 unsigned int lineValues[LINE_NUM];
 
-double sp1,sp2,sp3,sp4,sp5,sp6
+double sp1,sp2,sp3,sp4,sp5,sp6;
 double in1,in2,in3,in4,in5,in6;
 double out1,out2,out3,out4,out5,out6;
 
