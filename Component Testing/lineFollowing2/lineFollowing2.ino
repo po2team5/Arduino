@@ -1,5 +1,6 @@
 #include <QTRSensors.h>
 #include <Motor.h>
+#include <PID_v1.h>
 //Line sensor pins
 #define LINE_EMITTER  2
 #define LINE_ONE      4
@@ -16,6 +17,19 @@
 #define MOTOR_R1      9
 #define MOTOR_R2      10
 #define BASIS_SNELHEID  15
+//PID Tuning Parameters
+  //Proportional
+  #define KP_OUTER 3
+  #define KP_MIDDLE 2
+  #define KP_INNER 1
+  //Integrating
+  #define KI_OUTER 0.5
+  #define KI_MIDDLE .3
+  #define KI_INNER .1
+  //Differentiating
+  #define KD_OUTER 1
+  #define KD_MIDDLE .6
+  #define KD_INNER .3
 
 QTRSensorsRC lineSensor((unsigned char[])
 {LINE_ONE,
@@ -29,13 +43,16 @@ LINE_TIMEOUT,
 LINE_EMITTER);
 unsigned int lineValues[LINE_NUM];
 
+double sp1,sp2,sp3,sp4,sp5,sp6
+double in1,in2,in3,in4,in5,in6;
+double out1,out2,out3,out4,out5,out6;
 
-
-Motor motorLinks = Motor(MOTOR_L1,MOTOR_L2);
-Motor motorRechts = Motor(MOTOR_R1,MOTOR_R2);
-
-int linksCorrectie = 0;
-int rechtsCorrectie = 0;
+PID linePID1(&in1, &out1, &sp1, KP_OUTER, KI_OUTER, KD_OUTER, DIRECT);
+PID linePID2(&in2, &out2, &sp2, KP_MIDDLE, KI_MIDDLE, KD_MIDDLE, DIRECT);
+PID linePID3(&in3, &out3, &sp3, KP_INNER, KI_INNER, KD_INNER, DIRECT);
+PID linePID4(&in4, &out4, &sp4, KP_INNER, KI_INNER, KD_INNER, DIRECT);
+PID linePID5(&in5, &out5, &sp5, KP_MIDDLE, KI_MIDDLE, KD_MIDDLE, DIRECT);
+PID linePID6(&in6, &out6, &sp6, KP_OUTER, KI_OUTER, KD_OUTER, DIRECT);
 
 void setup() {
   delay(500);
@@ -43,22 +60,15 @@ void setup() {
     lineSensor.calibrate();
   }
   Serial.begin(9600);
-  motorLinks.setMotorSpeed(BASIS_SNELHEID);
-  motorRechts.setMotorSpeed(-BASIS_SNELHEID);
-  motorLinks.startMotor();
-  motorRechts.startMotor();
 }
 
 void loop() {
   unsigned int position = lineSensor.readLine(lineValues);
-  parseLine(lineValues);
-  Serial.print(links);
-  Serial.print("\t");
-  Serial.print(midden);
-  Serial.print("\t");
-  Serial.print(rechts);
-  Serial.println();
-  checkDirection();
-  updateMotorSpeed();
+  PIDScript(lineValues);
   delay(1);
 }
+
+void PIDScript(unsigned int values[]){
+  
+}
+
