@@ -5,21 +5,23 @@
 #define EMITTER_PIN   2     // emitter is controlled by digital pin 2
 
 // sensors 0 through 7 are connected to digital pins 3 through 10, respectively
-QTRSensorsRC qtrrc((unsigned char[]) {4, 7, 8, 11, 12,13},
-  NUM_SENSORS, TIMEOUT, EMITTER_PIN); 
+QTRSensorsRC qtrrc((unsigned char[]) {
+  4, 7, 8, 11, 12, 13
+},
+NUM_SENSORS, TIMEOUT, EMITTER_PIN);
 unsigned int sensorValues[NUM_SENSORS];
 
 
 void setup()
 {
   delay(500);
-  for (int i = 0; i<400; i++)
+  for (int i = 0; i < 400; i++)
   {
     qtrrc.calibrate();
   }
-  
+
   Serial.begin(9600); // set the data rate in bits per second for serial data transmission
-  for (int i = 0; i < NUM_SENSORS;i++)
+  for (int i = 0; i < NUM_SENSORS; i++)
   {
     Serial.print(qtrrc.calibratedMinimumOn[i]);
     Serial.print(' ');
@@ -50,6 +52,6 @@ void loop()
   }
   Serial.println();
   //Serial.println(position);
-  
-  delay(1000);
+
+  delay(500);
 }
