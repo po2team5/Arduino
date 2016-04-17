@@ -16,7 +16,7 @@ LINE_NUM,
 LINE_TIMEOUT,
 LINE_EMITTER);
 
-unsigned int lineValues[LINE_NUM];
+unsigned int rawLineValues[LINE_NUM];
 int lineCurrentError = 0;
 int lineLastError = 0;
 int linePropValue = 0;		//proportional line following component
@@ -26,4 +26,30 @@ int lineDiffValue = 0;		//deriving component
 
 void PID(){
 	
+}
+
+boolean calibrateLineSensor(){
+	delay(500);
+	Serial.println("Hold the sensor over the high reflectance surface (bright).")
+	for (int i = 0; i < 400; i++){
+		lineSensor.calibrate();
+	}
+	Serial.println("Hold the sensor over the low reflectance surface (dark).")
+	for (int i = 0; i < 400; i++){
+		lineSensor.calibrate();
+	}
+}
+
+void parseSensors(){
+
+}
+
+void setup(){
+	Serial.begin(9600);
+	while (not calibrateLineSensor()){}
+
+}
+
+void loop(){
+
 }
