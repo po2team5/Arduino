@@ -45,7 +45,7 @@ boolean calibrateLineSensor(){
 void parseSensors(){
 	lineSensor.read(rawLineValues);
 	for (int i; i<LINE_NUM; i++){
-		lineValues[i] = (rawLineValues > 400);
+		lineValues[i] = (rawLineValues > LINE_TRESHOLD);
 	}
 }
 
