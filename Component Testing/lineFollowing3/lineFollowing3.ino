@@ -17,6 +17,7 @@ LINE_TIMEOUT,
 LINE_EMITTER);
 
 unsigned int rawLineValues[LINE_NUM];
+bool lineValues[LINE_NUM];
 int lineCurrentError = 0;
 int lineLastError = 0;
 int linePropValue = 0;		//proportional line following component
@@ -38,10 +39,14 @@ boolean calibrateLineSensor(){
 	for (int i = 0; i < 400; i++){
 		lineSensor.calibrate();
 	}
+
 }
 
 void parseSensors(){
-
+	lineSensor.read(rawLineValues);
+	for (int i; i<LINE_NUM; i++){
+		lineValues[i] = (rawLineValues > 400);
+	}
 }
 
 void setup(){
