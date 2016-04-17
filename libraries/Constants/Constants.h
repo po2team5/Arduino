@@ -10,6 +10,7 @@
 	//Settings
 	#define LINE_NUM		6
 	#define LINE_TIMEOUT	2500
+	#define LINE_TRESHOLD	400		//Treshold for boolean conversion
 //Motors
 	//Pins
 	#define MOTOR_L1		5
