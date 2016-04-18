@@ -34,8 +34,10 @@ int PID(){
 	
 	if (lineIntValue > 255) lineIntValue = 255;
 	else if (lineIntValue < -255) lineIntValue = -255;
-
-	return linePropValue*K_PROP + lineIntValue*K_INT + lineDiffValue*K_DIFF;
+	turn = linePropValue*K_PROP + lineIntValue*K_INT + lineDiffValue*K_DIFF;
+	if(turn > 255) return 255;
+	else if (turn < -255) return -255;
+	else return turn;
 }
 
 boolean calibrateLineSensor(){
@@ -79,12 +81,24 @@ int calculateProportional(){
  	return lineCurrentError;
 }
 
+boolean labviewStart(){
+	return true;
+}
+
 void setup(){
 	Serial.begin(9600);
 	while (not calibrateLineSensor()){}
+	while (not labviewStart());
+	motorLeft.setSpeed(BASIS_SNELHEID);
+	motorRight.setSpeed(BASIS_SNELHEID);
+	motorLeft.startMotor();
+	motorRight.startMotor();
 }
 
 void loop(){
 	turn = PID();
-	speedRight = 
+	turn = Map(turn, 0, 255, 0, BASIS_SNELHEID);
+	motorLeft.setSpeed(BASIS_SNELHEID + (turn>0)*turn;);
+	motorRight.setSpeed(BASIS_SNELHEID + (turn<0)*turn;);
+	
 }
