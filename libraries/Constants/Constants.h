@@ -18,7 +18,7 @@
 	#define MOTOR_R1		9
 	#define MOTOR_R2		10
 	//Settings
-	#define BASIS_SNELHEID	15
+	#define BASIS_SNELHEID	30
 //PID Tuning Parameters
 	#define K_PROP			1		//Increase overshoot, decrease constant error
 	#define K_INT			0		//Increase overshoot, eliminate constant error
