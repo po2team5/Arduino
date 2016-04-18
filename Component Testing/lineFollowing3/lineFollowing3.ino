@@ -4,6 +4,9 @@
 
 Motor motorLeft = Motor(MOTOR_L1,MOTOR,L2);
 Motor motorRight = Motor(MOTOR_R1,MOTOR,R2);
+int speedLeft;
+int speedRight;
+int turn = 0;
 
 QTRSensorsRC lineSensor((unsigned char[])
 {LINE_ONE,
@@ -18,28 +21,36 @@ LINE_EMITTER);
 
 unsigned int rawLineValues[LINE_NUM];
 bool lineValues[LINE_NUM];
-int lineCurrentError = 0;
 int lineLastError = 0;
-int linePropValue = 0;		//proportional line following component
-int lineIntValue = 0;		//integrating component
-int lineDiffValue = 0;		//deriving component
 
 
-void PID(){
+int PID(){
+	parseSensors();
 	
+	int lineCurrentError = calculateProportional();
+	int linePropValue = lineCurrentError;
+	int lineDiffValue = lineLastError - lineCurrentError;
+	int lineIntValue = lineIntValue + linePropValue;
+	
+	if (lineIntValue > 255) lineIntValue = 255;
+	else if (lineIntValue < -255) lineIntValue = -255;
+
+	return linePropValue*K_PROP + lineIntValue*K_INT + lineDiffValue*K_DIFF;
 }
 
 boolean calibrateLineSensor(){
 	delay(500);
-	Serial.println("Hold the sensor over the high reflectance surface (bright).")
+	Serial.println("Hold the sensor over the high reflectance surface (line).")
 	for (int i = 0; i < 400; i++){
 		lineSensor.calibrate();
 	}
-	Serial.println("Hold the sensor over the low reflectance surface (dark).")
+	Serial.println("Hold the sensor over the low reflectance surface (background).")
 	for (int i = 0; i < 400; i++){
 		lineSensor.calibrate();
 	}
-
+	int boolSum = 0;
+	for (int i; i<LINE_NUM; i++) boolSum = boolSum + (lineSensor.calibratedMinimumOn[i]<lineSensor.calibratedMaximumOn[i]);
+	return boolSum==0;
 }
 
 void parseSensors(){
@@ -49,12 +60,31 @@ void parseSensors(){
 	}
 }
 
+int calculateProportional(){
+	int sum = 0;
+	int lPos = 10;
+	int rPos = 10;
+	for (int i; i<LINE_NUM/2; i++){
+		sum = sum + lineValues[i] + lineValues[LINE_NUM-i];
+		if(lineValues[i]==1) posLeft = i-3;
+		if(lineValues[LINE_NUM-i]==1) posRight = (LINE_NUM-i) - 4;
+	}
+	if(sum==0){
+		if(lineLastError<0) lineCurrentError = -8
+		else lineCurrentError = 8
+	}
+	else if(posRight!=10 && posLeft!=10) lineCurrentError = 0;
+	else if(posLeft!=10) error=posLeft*2+sum;
+ 	else if(posRight!=10) error=posRight*2-sum;
+ 	return lineCurrentError;
+}
+
 void setup(){
 	Serial.begin(9600);
 	while (not calibrateLineSensor()){}
-
 }
 
 void loop(){
-
+	turn = PID();
+	speedRight = 
 }
