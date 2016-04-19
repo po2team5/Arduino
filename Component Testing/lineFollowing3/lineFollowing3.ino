@@ -1,9 +1,34 @@
-#include <Constants.h>
+//Line sensor            Notes:
+  //Pins
+  #define LINE_EMITTER  2   //Unused
+  #define LINE_ONE    4
+  #define LINE_TWO    7
+  #define LINE_THREE    8
+  #define LINE_FOUR   11
+  #define LINE_FIVE   12
+  #define LINE_SIX    13
+  //Settings
+  #define LINE_NUM    6
+  #define LINE_TIMEOUT  2500
+  #define LINE_TRESHOLD 600   //Treshold for boolean conversion
+//Motors
+  //Pins
+  #define MOTOR_L1    5
+  #define MOTOR_L2    6
+  #define MOTOR_R1    9
+  #define MOTOR_R2    10
+  //Settings
+  #define BASIS_SNELHEID  15
+//PID Tuning Parameters
+  #define K_PROP      1   //Increase overshoot, decrease constant error
+  #define K_INT     1   //Increase overshoot, eliminate constant error
+  #define K_DIFF      1   //Decrease overshoot, keep small for stability
+
 #include <QTRSensors.h>
 #include <Motor.h>
 
-Motor motorLeft = Motor(MOTOR_L1,MOTOR,L2);
-Motor motorRight = Motor(MOTOR_R1,MOTOR,R2);
+Motor motorLeft = Motor(MOTOR_L1,MOTOR_L2);
+Motor motorRight = Motor(MOTOR_R1,MOTOR_R2);
 int speedLeft;
 int speedRight;
 int turn = 0;
@@ -42,23 +67,27 @@ int PID(){
 
 boolean calibrateLineSensor(){
 	delay(500);
-	Serial.println("Hold the sensor over the high reflectance surface (line).")
-	for (int i = 0; i < 400; i++){
+	Serial.println("Hold the sensor over the high reflectance surface (line).");
+	for (int i = 0; i < 100; i++){
 		lineSensor.calibrate();
 	}
-	Serial.println("Hold the sensor over the low reflectance surface (background).")
-	for (int i = 0; i < 400; i++){
+	Serial.println("Hold the sensor over the low reflectance surface (background).");
+	for (int i = 0; i < 100; i++){
 		lineSensor.calibrate();
 	}
 	int boolSum = 0;
-	for (int i; i<LINE_NUM; i++) boolSum = boolSum + (lineSensor.calibratedMinimumOn[i]<lineSensor.calibratedMaximumOn[i]);
-	return boolSum==0;
+	for (int i; i<LINE_NUM; i++){
+    Serial.print(lineSensor.calibratedMinimumOn[i]);
+    Serial.print(" - ");
+    Serial.print(lineSensor.calibratedMaximumOn[i]);
+    Serial.println();
+	}
 }
 
 void parseSensors(){
 	lineSensor.read(rawLineValues);
 	for (int i; i<LINE_NUM; i++){
-		lineValues[i] = (rawLineValues > LINE_TRESHOLD);
+		lineValues[i] = (rawLineValues[i] > LINE_TRESHOLD);
 	}
 }
 
@@ -66,18 +95,19 @@ int calculateProportional(){
 	int sum = 0;
 	int lPos = 10;
 	int rPos = 10;
+  int lineCurrentError;
 	for (int i; i<LINE_NUM/2; i++){
 		sum = sum + lineValues[i] + lineValues[LINE_NUM-i];
-		if(lineValues[i]==1) posLeft = i-3;
-		if(lineValues[LINE_NUM-i]==1) posRight = (LINE_NUM-i) - 4;
+		if(lineValues[i]==1) lPos = i-3;
+		if(lineValues[LINE_NUM-i]==1) rPos = (LINE_NUM-i) - 4;
 	}
 	if(sum==0){
-		if(lineLastError<0) lineCurrentError = -8
-		else lineCurrentError = 8
+		if(lineLastError<0) lineCurrentError = -8;
+		else lineCurrentError = 8;
 	}
-	else if(posRight!=10 && posLeft!=10) lineCurrentError = 0;
-	else if(posLeft!=10) error=posLeft*2+sum;
- 	else if(posRight!=10) error=posRight*2-sum;
+	else if(rPos!=10 && lPos!=10) lineCurrentError = 0;
+	else if(lPos!=10) lineCurrentError=lPos*2+sum;
+ 	else if(rPos!=10) lineCurrentError=rPos*2-sum;
  	return lineCurrentError;
 }
 
@@ -87,18 +117,31 @@ boolean labviewStart(){
 
 void setup(){
 	Serial.begin(9600);
-	while (not calibrateLineSensor()){}
-	while (not labviewStart());
-	motorLeft.setSpeed(BASIS_SNELHEID);
-	motorRight.setSpeed(BASIS_SNELHEID);
+  calibrateLineSensor();
+  Serial.println("Done Calibrating!");
+	//while (not calibrateLineSensor()){}
+	//while (not labviewStart());
+	motorLeft.setMotorSpeed(BASIS_SNELHEID);
+	motorRight.setMotorSpeed(BASIS_SNELHEID);
 	motorLeft.startMotor();
 	motorRight.startMotor();
 }
 
 void loop(){
 	turn = PID();
-	turn = Map(turn, 0, 255, 0, BASIS_SNELHEID);
-	motorLeft.setSpeed(BASIS_SNELHEID + (turn>0)*turn;);
-	motorRight.setSpeed(BASIS_SNELHEID + (turn<0)*turn;);
-	
+	turn = map(turn, 0, 255, 0, BASIS_SNELHEID);
+  for (int i; i<LINE_NUM; i++){
+    Serial.print(lineValues[i]);
+    Serial.print("\t");
+  }
+  Serial.println();
+  Serial.println(turn);
+  if (turn>0){
+    motorLeft.setMotorSpeed(BASIS_SNELHEID - turn);
+    motorRight.setMotorSpeed(BASIS_SNELHEID);
+  }else{
+    motorLeft.setMotorSpeed(BASIS_SNELHEID);
+    motorRight.setMotorSpeed(BASIS_SNELHEID + turn);
+  }
+	delay(250);
 }
