@@ -10,7 +10,7 @@
   //Settings
   #define LINE_NUM    6
   #define LINE_TIMEOUT  2500
-  #define LINE_TRESHOLD 600   //Treshold for boolean conversion
+  #define LINE_TRESHOLD 1400   //Treshold for boolean conversion
 //Motors
   //Pins
   #define MOTOR_L1    5
@@ -18,11 +18,11 @@
   #define MOTOR_R1    9
   #define MOTOR_R2    10
   //Settings
-  #define BASIS_SNELHEID  15
+  #define BASIS_SNELHEID  30
 //PID Tuning Parameters
-  #define K_PROP      1   //Increase overshoot, decrease constant error
-  #define K_INT     1   //Increase overshoot, eliminate constant error
-  #define K_DIFF      1   //Decrease overshoot, keep small for stability
+  #define K_PROP      10   //Increase overshoot, decrease constant error
+  #define K_INT     5   //Increase overshoot, eliminate constant error
+  #define K_DIFF      2   //Decrease overshoot, keep small for stability
 
 #include <QTRSensors.h>
 #include <Motor.h>
@@ -45,7 +45,7 @@ LINE_TIMEOUT,
 LINE_EMITTER);
 
 unsigned int rawLineValues[LINE_NUM];
-bool lineValues[LINE_NUM];
+int lineValues[LINE_NUM];
 int lineLastError = 0;
 
 
@@ -56,7 +56,7 @@ int PID(){
 	int linePropValue = lineCurrentError;
 	int lineDiffValue = lineLastError - lineCurrentError;
 	int lineIntValue = lineIntValue + linePropValue;
-	
+	lineLastError = lineCurrentError;
 	if (lineIntValue > 255) lineIntValue = 255;
 	else if (lineIntValue < -255) lineIntValue = -255;
 	turn = linePropValue*K_PROP + lineIntValue*K_INT + lineDiffValue*K_DIFF;
@@ -91,7 +91,7 @@ void parseSensors(){
 	}
 }
 
-int calculateProportional(){
+/*int calculateProportional(){
 	int sum = 0;
 	int lPos = 10;
 	int rPos = 10;
@@ -108,7 +108,48 @@ int calculateProportional(){
 	else if(rPos!=10 && lPos!=10) lineCurrentError = 0;
 	else if(lPos!=10) lineCurrentError=lPos*2+sum;
  	else if(rPos!=10) lineCurrentError=rPos*2-sum;
+  Serial.print(lineCurrentError);
  	return lineCurrentError;
+}*/
+
+int calculateProportional(){
+  int sum = 0;
+  int lPos = 10;
+  int rPos = 10;
+  int lineCurrentError;
+  for (int i=0; i<LINE_NUM/2; i++){
+    sum=sum+lineValues[i];
+    if(lineValues[i]==1){
+      lPos=i-3;
+    }
+  }
+  for (int i=LINE_NUM-1; i>=LINE_NUM/2; i--){
+     sum=sum+lineValues[i];
+     if(lineValues[i]==1){
+       rPos=i-4;
+     }
+  }
+  if(sum>=3){
+     sum=2;
+  }
+  if(sum==0){
+    if(lineLastError<0){
+      lineCurrentError=-8;
+    } else{
+    lineCurrentError=8; }
+    }
+  else if((lPos!=10)&&(rPos!=10)){
+    lineCurrentError=0; }
+  else if(lPos!=10){
+    lineCurrentError=lPos*2+sum;
+  }
+  else if(rPos!=10){
+    lineCurrentError=rPos*2-sum;
+  }
+  Serial.print(rPos); Serial.print("\t"); Serial.print(lPos);
+  Serial.println();
+  Serial.println(lineCurrentError);
+  return lineCurrentError;
 }
 
 boolean labviewStart(){
@@ -116,7 +157,7 @@ boolean labviewStart(){
 }
 
 void setup(){
-	Serial.begin(9600);
+	Serial.begin(115200);
   calibrateLineSensor();
   Serial.println("Done Calibrating!");
 	//while (not calibrateLineSensor()){}
@@ -129,19 +170,13 @@ void setup(){
 
 void loop(){
 	turn = PID();
-	turn = map(turn, 0, 255, 0, BASIS_SNELHEID);
-  for (int i; i<LINE_NUM; i++){
-    Serial.print(lineValues[i]);
-    Serial.print("\t");
-  }
-  Serial.println();
   Serial.println(turn);
   if (turn>0){
-    motorLeft.setMotorSpeed(BASIS_SNELHEID - turn);
-    motorRight.setMotorSpeed(BASIS_SNELHEID);
+    analogWrite(MOTOR_L1,BASIS_SNELHEID - turn);
+    analogWrite(MOTOR_R1,BASIS_SNELHEID);
   }else{
-    motorLeft.setMotorSpeed(BASIS_SNELHEID);
-    motorRight.setMotorSpeed(BASIS_SNELHEID + turn);
+    analogWrite(MOTOR_L1,BASIS_SNELHEID);
+    analogWrite(MOTOR_R1,BASIS_SNELHEID + turn);
   }
 	delay(250);
 }
