@@ -20,9 +20,9 @@
   #define BASIS_SNELHEID  40
 //PID Parameters
   #define SETPOINT  2500
-  #define K_PROP      5   //Increase overshoot, decrease constant error
+  #define K_PROP      1   //Increase overshoot, decrease constant error
 //  #define K_INT     5   //Increase overshoot, eliminate constant error
-  #define K_DIFF      1   //Decrease overshoot, keep small for stability
+  #define K_DIFF      .1   //Decrease overshoot, keep small for stability
 
 #include <QTRSensors.h>
 #include <Motor.h>
