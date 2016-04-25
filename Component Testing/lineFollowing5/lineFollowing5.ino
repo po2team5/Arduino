@@ -17,12 +17,13 @@
   #define MOTOR_L1    10
   #define MOTOR_L2    9
   //Settings
-  #define BASIS_SNELHEID  35
+  #define BASIS_R  35
+  #define BASIS_L  30
 //PID Parameters
-  #define SETPOINT  2500
+  #define SETPOINT  3500
   #define K_PROP      2   //Increase overshoot, decrease constant error
 //  #define K_INT     5   //Increase overshoot, eliminate constant error
-  #define K_DIFF      0   //Decrease overshoot, keep small for stability
+  #define K_DIFF      1   //Decrease overshoot, keep small for stability
 
 #include <QTRSensors.h>
 #include <Motor.h>
@@ -49,7 +50,7 @@ void PID(){
   int error = SETPOINT - position;
   turn = K_PROP * error + K_DIFF * (error - lastError);
   Serial.println(turn);
-  turn = map(turn,-5000,5000,-15,15);
+  turn = map(turn,-5000,5000,-30,30);
   lastError = error;
 }
 
@@ -88,10 +89,10 @@ void loop(){
 	PID();
   Serial.println(turn);
   if (turn>0){
-    analogWrite(MOTOR_L1,BASIS_SNELHEID);
-    analogWrite(MOTOR_R1,BASIS_SNELHEID - turn);
+    analogWrite(MOTOR_L1,BASIS_L - turn);
+    analogWrite(MOTOR_R1,BASIS_R + turn);
   }else{
-    analogWrite(MOTOR_L1,BASIS_SNELHEID + turn);
-    analogWrite(MOTOR_R1,BASIS_SNELHEID);
+    analogWrite(MOTOR_L1,BASIS_L - turn);
+    analogWrite(MOTOR_R1,BASIS_R + turn);
   }
 }
