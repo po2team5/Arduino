@@ -20,7 +20,7 @@ void setup()
     qtrrc.calibrate();
   }
 
-  Serial.begin(9600); // set the data rate in bits per second for serial data transmission
+  Serial.begin(115200); // set the data rate in bits per second for serial data transmission
   for (int i = 0; i < NUM_SENSORS; i++)
   {
     Serial.print(qtrrc.calibratedMinimumOn[i]);
@@ -51,7 +51,7 @@ void loop()
     Serial.print('\t'); // tab to format the raw data into columns in the Serial monitor
   }
   Serial.println();
-  //Serial.println(position);
+  Serial.println(position);
 
   delay(1000);
 }
