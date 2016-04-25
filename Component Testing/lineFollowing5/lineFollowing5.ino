@@ -12,10 +12,10 @@
   #define LINE_TIMEOUT  2500
 //Motors
   //Pins
-  #define MOTOR_L1    5
-  #define MOTOR_L2    6
-  #define MOTOR_R1    9
-  #define MOTOR_R2    10
+  #define MOTOR_R1    5
+  #define MOTOR_R2    6
+  #define MOTOR_L1    10
+  #define MOTOR_L2    9
   //Settings
   #define BASIS_SNELHEID  40
 //PID Parameters
@@ -27,10 +27,6 @@
 #include <QTRSensors.h>
 #include <Motor.h>
 
-Motor motorLeft = Motor(MOTOR_L1,MOTOR_L2);
-Motor motorRight = Motor(MOTOR_R1,MOTOR_R2);
-int speedLeft;
-int speedRight;
 int turn = 0;
 int lastError = 0;
 
