@@ -47,6 +47,13 @@ unsigned int lineValues[LINE_NUM];
 
 void PID(){
   unsigned int position = lineSensor.readLine(lineValues);
+  if (checkStop()){
+    analogWrite(MOTOR_L1,0);
+    analogWrite(MOTOR_R1,0);
+    while (true){
+      //if labviewStart() break;
+    }
+  }
   int error = SETPOINT - position;
   turn = K_PROP * error + K_DIFF * (error - lastError);
   Serial.println(turn);
@@ -71,6 +78,16 @@ boolean calibrateLineSensor(){
     Serial.print(lineSensor.calibratedMaximumOn[i]);
     Serial.println();
 	}
+}
+
+boolean checkStop(){
+  unsigned int sum = 0;
+  for (int i = 0; i<LINE_NUM; i++){
+    sum = sum + lineValues[i];
+  }
+  Serial.println(sum);
+  if (sum<250) return true;
+  return false;
 }
 
 boolean labviewStart(){
