@@ -20,8 +20,8 @@
   #define BASIS_R  35
   #define BASIS_L  30
 //PID Parameters
-  #define SETPOINT  3500
-  #define K_PROP      2   //Increase overshoot, decrease constant error
+  #define SETPOINT  2750
+  #define K_PROP      2.5   //Increase overshoot, decrease constant error
 //  #define K_INT     5   //Increase overshoot, eliminate constant error
   #define K_DIFF      1   //Decrease overshoot, keep small for stability
 
@@ -50,7 +50,7 @@ void PID(){
   int error = SETPOINT - position;
   turn = K_PROP * error + K_DIFF * (error - lastError);
   Serial.println(turn);
-  turn = map(turn,-5000,5000,-30,30);
+  turn = map(turn,-5000,5000,-BASIS_R,BASIS_L);
   lastError = error;
 }
 
